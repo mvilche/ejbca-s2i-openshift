@@ -2,7 +2,6 @@ FROM alpine:3.11
 
 ENV MAVEN_VERSION=3.6.3 \
 JDK_VERSION=openjdk8 \
-WILDFLY_VERSION=https://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.tar.gz
 
 LABEL autor="Martin Vilche <mfvilche@gmail.com>" \
       io.k8s.description="Compilador de aplicaciones java con maven s2i" \
@@ -14,10 +13,7 @@ LABEL autor="Martin Vilche <mfvilche@gmail.com>" \
 
 RUN apk add --update --no-cache $JDK_VERSION wget apache-ant bash git busybox-extras msttcorefonts-installer fontconfig  which openssh shadow busybox-suid coreutils tzdata
 
-RUN mkdir -p /opt/wildfly /opt/config /opt/maven && rm -rf /etc/localtime && \
-wget -q http://www-eu.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-tar xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /opt/maven && rm apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-ln -s /opt/maven/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/bin/mvn && \
+RUN mkdir -p /opt/wildfly && rm -rf /etc/localtime  && \
     update-ms-fonts && \
     fc-cache -f && \
 wget $WILDFLY_VERSION --progress=bar:force -O /tmp/wildfly.tar.gz && \
@@ -40,7 +36,7 @@ ENV HOME /home/s2i
 
 USER 1001
 
-EXPOSE 8080 8009 8778
+EXPOSE 8080 8009 8778 8443
 
 CMD ["/usr/libexec/s2i/usage"]
 
