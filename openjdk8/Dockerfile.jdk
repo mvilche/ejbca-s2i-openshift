@@ -28,7 +28,8 @@ COPY s2i/bin/ /usr/libexec/s2i
 RUN touch /etc/localtime /etc/timezone && adduser -D -u 1001 s2i && usermod -aG 0 s2i && \
 chown -R 1001 /opt /home/s2i /usr/libexec/s2i /etc/localtime /etc/timezone  && \
 chgrp -R 0 /opt /home/s2i /usr/libexec/s2i /etc/localtime /etc/timezone  && \
-chmod -R g=u /opt /usr/libexec/s2i /etc/localtime /etc/timezone
+chmod -R g=u /opt /usr/libexec/s2i /etc/localtime /etc/timezone && \
+chmod +x /usr/libexec/s2i/*
 
 WORKDIR /opt/wildfly
 
