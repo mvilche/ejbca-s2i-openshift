@@ -57,3 +57,4 @@ echo "ELIMINANDO WAR, MANTENIENDO EAR"
 rm -rf /opt/wildfly/standalone/deployments/*.war
 fi
 ls -1 /opt/wildfly/standalone/deployments/
+/usr/libexec/s2i/fix /opt/ejbca
