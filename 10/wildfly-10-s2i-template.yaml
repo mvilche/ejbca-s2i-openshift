@@ -139,8 +139,6 @@
           uri: ${REPO_GIT}
           ref: ${BRANCH_GIT}
         type: Git
-        sourceSecret:
-          name: ${SOURCE_SECRET}
       strategy:
         sourceStrategy:
           incremental: true
