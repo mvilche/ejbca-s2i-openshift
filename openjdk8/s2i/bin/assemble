@@ -131,4 +131,3 @@ rm -rf /opt/wildfly/standalone/deployments/*.war
 fi
 
 ls -1 /opt/wildfly/standalone/deployments/
-cd $HOME && rm -rf /opt/src /tmp/src
