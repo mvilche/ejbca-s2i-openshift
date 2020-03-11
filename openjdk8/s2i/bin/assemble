@@ -25,7 +25,7 @@ fi
 
 
 echo "---> INSTALANDO CODIGO FUENTE..."
-mkdir /opt/src
+mkdir /opt/ejbca
 cp -Rf /tmp/src/* /opt/ejbca/
 rm -rf /tmp/src
 
