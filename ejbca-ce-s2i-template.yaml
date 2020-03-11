@@ -60,7 +60,10 @@
                   name: jolokia
                 - containerPort: 8443
                   protocolo: TCP
-                  name: https                  
+                  name: https
+                - containerPort: 8009
+                  protocolo: TCP
+                  name: ajp                                
               livenessProbe:
                 failureThreshold: 3
                 initialDelaySeconds: 60
@@ -103,7 +106,7 @@
                     path: standalone.xml
                   - key: standalone.conf
                     path: standalone.conf
-                name: wildfly-config
+                name: wildfly-config-${APP_NAME}
               name: configmap-1
       test: false
       triggers:
@@ -130,7 +133,7 @@
       output:
         to:
           kind: ImageStreamTag
-          name: ${APP_NAME}-s2i:latest
+          name: ${APP_NAME}:latest
       postCommit: {}
       resources: {}
       runPolicy: Serial
@@ -139,14 +142,12 @@
           uri: ${REPO_GIT}
           ref: ${BRANCH_GIT}
         type: Git
-        sourceSecret:
-          name: ${SOURCE_SECRET}
       strategy:
         sourceStrategy:
           incremental: true
           from:
             kind: ImageStreamTag
-            name: wildfly-${WILDFLY_VERSION}-s2i:latest
+            name: wildfly-10-s2i:latest
         type: Source
       successfulBuildsHistoryLimit: 5
       triggers:
@@ -154,50 +155,10 @@
         - imageChange:
             from:
               kind: "ImageStreamTag"
-              name: "wildfly-${WILDFLY_VERSION}-s2i:latest"        
+              name: "wildfly-10-s2i:latest"        
 
 
 
-
-  - apiVersion: v1
-    kind: BuildConfig
-    metadata:
-      labels:
-        app: ${APP_NAME}
-      name: ${APP_NAME}-runtime
-    spec:
-      completionDeadlineSeconds: 1800
-      output:
-        to:
-          kind: ImageStreamTag
-          name: ${APP_NAME}:latest
-      source:
-        type: Dockerfile
-        dockerfile: |-
-                FROM wildfly-${WILDFLY_VERSION}-runtime:latest
-                COPY deployments /opt/wildfly/standalone/deployments
-                USER root
-                RUN chown 1001:0 -R /opt/wildfly/standalone/deployments
-                USER 1001
-        images:
-        - from:
-            kind: ImageStreamTag
-            name: ${APP_NAME}-s2i:latest
-          paths:
-          - sourcePath: /opt/wildfly/standalone/deployments
-            destinationDir: "."
-      strategy:
-        dockerStrategy:
-          from:
-            kind: ImageStreamTag
-            name: wildfly-${WILDFLY_VERSION}-runtime:latest
-        type: Docker
-      triggers:
-      - type: "imageChange"
-        imageChange:
-          from:
-            kind: "ImageStreamTag"
-            name: "${APP_NAME}-s2i:latest"
 
 
 
@@ -248,6 +209,23 @@
       wildcardPolicy: None
 
 
+
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      labels:
+        app: ${APP_NAME}
+      name: ${APP_NAME}-https
+    spec:
+      port:
+        targetPort: https
+      to:
+        kind: Service
+        name: ${APP_NAME}
+        weight: 100
+      wildcardPolicy: None      
+
+
   - apiVersion: v1
     kind: ImageStream
     metadata:
@@ -271,20 +249,20 @@
     metadata:
       labels:
         app: ${APP_NAME}
-        build: wildfly-${WILDFLY_VERSION}-s2i
-      name: wildfly-${WILDFLY_VERSION}-s2i
+        build: wildfly-10-s2i
+      name: wildfly-10-s2i
     spec:
       failedBuildsHistoryLimit: 5
       nodeSelector: null
       output:
         to:
           kind: ImageStreamTag
-          name: 'wildfly-${WILDFLY_VERSION}-s2i:latest'
+          name: 'wildfly-10-s2i:latest'
       postCommit: {}
       resources: {}
       runPolicy: Serial
       source:
-        contextDir: ${WILDFLY_VERSION}/openjdk${VERSION_JDK}
+        contextDir: openjdk8
         git:
           ref: master
           uri: 'https://github.com/mvilche/wildfly-s2i.git'
@@ -303,45 +281,7 @@
     metadata:
       labels:
         app: ${APP_NAME}
-      name: wildfly-${WILDFLY_VERSION}-s2i
-    spec: {}
-
-  - apiVersion: v1
-    kind: BuildConfig
-    metadata:
-      labels:
-        app: ${APP_NAME}
-      name: wildfly-${WILDFLY_VERSION}-runtime
-    spec:
-      failedBuildsHistoryLimit: 5
-      nodeSelector: null
-      output:
-        to:
-          kind: ImageStreamTag
-          name: 'wildfly-${WILDFLY_VERSION}-runtime:latest'
-      postCommit: {}
-      resources: {}
-      runPolicy: Serial
-      source:
-        contextDir: ${WILDFLY_VERSION}/openjdk${VERSION_JDK}
-        git:
-          ref: master
-          uri: 'https://github.com/mvilche/wildfly-s2i.git'
-        type: Git
-      strategy:
-        dockerStrategy:
-          dockerfilePath: Dockerfile.jre
-        type: Docker
-      successfulBuildsHistoryLimit: 5
-      triggers:
-        - type: ConfigChange
-
-  - apiVersion: v1
-    kind: ImageStream
-    metadata:
-      labels:
-        app: ${APP_NAME}
-      name: wildfly-${WILDFLY_VERSION}-runtime
+      name: wildfly-10-s2i
     spec: {}
 
 
