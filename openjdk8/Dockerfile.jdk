@@ -1,6 +1,6 @@
 FROM alpine:3.11
 
-ENV WILDFLY_VERSION=https://download.jboss.org/wildfly/10.0.0.Final/wildfly-10.0.0.Final.tar.gz \
+ENV WILDFLY_VERSION=https://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.tar.gz \
 JDK_VERSION=openjdk8
 
 LABEL autor="Martin Vilche <mfvilche@gmail.com>" \
