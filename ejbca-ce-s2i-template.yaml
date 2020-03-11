@@ -219,8 +219,11 @@
     spec:
       port:
         targetPort: https
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: passthrough        
       to:
-        kind: Service
+        kind: Service 
         name: ${APP_NAME}
         weight: 100
       wildcardPolicy: None      
@@ -265,7 +268,7 @@
         contextDir: openjdk8
         git:
           ref: master
-          uri: 'https://github.com/mvilche/wildfly-s2i.git'
+          uri: 'https://github.com/mvilche/ejbca-s2i-openshift.git'
         type: Git
       strategy:
         dockerStrategy:
