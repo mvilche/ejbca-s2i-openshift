@@ -210,7 +210,7 @@
           protocol: TCP
           targetPort: 8443
         - name: priv
-          port: 8443
+          port: 8442
           protocol: TCP
           targetPort: 8442                  
       selector:
