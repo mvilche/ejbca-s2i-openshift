@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # S2I run script for the 'springboot-sti' image.
 # The run script executes the server that runs your application.
@@ -32,7 +32,7 @@ if [ ! -f "$WILDFLY_DIR/standalone/configuration/keystore/nodelete" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/stdout &
 sleep 60
-cd /opt/ejbca && ant runinstall &> /dev/null && ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS INICIADOS CORRECTAMENTE."
+cd /opt/ejbca && ant install &> /dev/null ; ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS INICIADOS CORRECTAMENTE."
 
 javapid=$(pidof java)
 kill -15 $javapid
