@@ -32,7 +32,11 @@ if [ ! -f "$WILDFLY_DIR/standalone/configuration/keystore/nodelete" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 echo "-----> POR FAVOR AGUARDE UNOS MINUTOS MIENTRAS SE INICIALIZA LA INSTALACION...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/null &
-sleep 40
+sleep 30
+if [ ! -z $CA_SERVER_DOMAIN ]; then
+echo "-----> UTILIZANDO COMO NOMBRE DE DOMINIO PARA CA SERVER $CA_SERVER_DOMAIN"
+sed -i -e "s/^#httpsserver.hostname=localhost/httpsserver.hostname=$CA_SERVER_DOMAIN/" /opt/ejbca/conf/web.properties
+fi
 cd /opt/ejbca && ant install &> /dev/null ; ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS GENERADOS CORRECTAMENTE."
 javapid=$(pidof java)
 kill -15 $javapid
@@ -44,11 +48,8 @@ echo "-----> AGUARDANDO QUE WILDFLY SE CIERRE DE FORMA CORRECTA - ESPERE..."
 sleep 5
 javapid=$(pidof java)
 done
-
 echo "-----> ###############################################"
-
 echo "-----> TAREAS FINALIZADAS."
-
 echo "-----> RECUERDE IMPORTAR EL CERTIFICADO superadmin.p12 EN SU NAVEGADOR"
 echo "-----> GENERADO EN EL VOLUMEN PERSISTENTE"
 echo "-----> PASSWORD: ejbca"
