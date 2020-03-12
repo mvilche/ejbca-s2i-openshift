@@ -35,7 +35,7 @@ exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/
 sleep 30
 if [ ! -z $CA_SERVER_DOMAIN ]; then
 echo "-----> UTILIZANDO COMO NOMBRE DE DOMINIO PARA CA SERVER $CA_SERVER_DOMAIN"
-sed -i -e "s/^#httpsserver.hostname=localhost/httpsserver.hostname=$CA_SERVER_DOMAIN/" /opt/ejbca/conf/web.properties
+sed -i -e "s/^httpsserver.hostname=localhost/httpsserver.hostname=$CA_SERVER_DOMAIN/" /opt/ejbca/conf/web.properties
 fi
 cd /opt/ejbca && ant install &> /dev/null ; ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS GENERADOS CORRECTAMENTE."
 javapid=$(pidof java)
