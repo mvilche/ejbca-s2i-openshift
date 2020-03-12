@@ -36,7 +36,8 @@ sleep 40
 cd /opt/ejbca && ant install &> /dev/null ; ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS GENERADOS CORRECTAMENTE."
 javapid=$(pidof java)
 kill -15 $javapid
- echo "-----> DETENIENDO WILDFLY AGUARDE...."
+echo "-----> DETENIENDO WILDFLY AGUARDE...."
+javapid=$(pidof java)
 while [ $javapid == 0 ]
 do
 echo "-----> AGUARDANDO QUE WILDFLY SE CIERRE DE FORMA CORRECTA - ESPERE..."
@@ -57,5 +58,5 @@ echo "-----> VOLVIENDO A INICIAR WILDFLY AGUARDE..."
 fi
 rm -rf $WILDFLY_DIR/standalone/deployments/*.undeployed $WILDFLY_DIR/standalone/deployments/*.deployed
 cat $WILDFLY_DIR/standalone/configuration/custom/standalone.conf > $WILDFLY_DIR/bin/standalone.conf
-keytool -genkey -keyalg RSA -alias selfsigned -keystore $WILDFLY_DIR/jolokia.jks -storepass password -validity 360 -keysize 2048 -dname "cn=jolokia, ou=jolokia, o=jolokia, c=jolokia"
+keytool -genkey -keyalg RSA -alias selfsigned -keystore $WILDFLY_DIR/jolokia.jks -storepass password -validity 360 -keysize 2048 -dname "cn=jolokia, ou=jolokia, o=jolokia, c=jolokia" &> /dev/null
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0
