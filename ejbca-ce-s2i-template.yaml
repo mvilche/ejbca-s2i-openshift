@@ -97,12 +97,12 @@
               volumeMounts:
                 - mountPath: /opt/wildfly/standalone/configuration/custom/
                   name: configmap-1
-                - name: ejbca-data-p12
+                - name: ejbca-config
                   mountPath: /opt/ejbca/p12
                   subPath: ejbca-data-p12
-                - name: ejbca-data-wildfly
-                  mountPath: /opt/wildfly/standalone/configuration/keystore
-                  subPath: ejbca-keystore-wildfly                                   
+                - mountPath: /opt/wildfly/standalone/configuration/keystore
+                  name: ejbca-config
+                  subPath: wildfly-keystore
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -117,12 +117,9 @@
                     path: standalone.conf
                 name: wildfly-config-${APP_NAME}
               name: configmap-1
-            - name: ejbca-data-p12
+            - name: ejbca-config
               persistentVolumeClaim:
-                claimName: ejbca-data
-            - name: ejbca-data-wildfly
-              persistentVolumeClaim:
-                claimName: ejbca-data                                 
+                claimName: ejbca-data                          
       test: false
       triggers:
         - type: ConfigChange

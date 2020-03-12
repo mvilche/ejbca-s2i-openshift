@@ -31,8 +31,9 @@ fi
 if [ ! -f "$WILDFLY_DIR/standalone/configuration/keystore/nodelete" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/stdout &
-sleep 60
+sleep 40
 cd /opt/ejbca && ant install &> /dev/null ; ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS INICIADOS CORRECTAMENTE."
+rm -rf $WILDFLY_DIR/standalone/deployment/*.ear.*
 
 javapid=$(pidof java)
 kill -15 $javapid
