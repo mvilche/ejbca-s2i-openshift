@@ -32,10 +32,22 @@ if [ ! -f "$WILDFLY_DIR/standalone/configuration/keystore/nodelete" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 echo "-----> POR FAVOR AGUARDE UNOS MINUTOS MIENTRAS SE INICIALIZA LA INSTALACION...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/null &
+
 until nc -z -v -w5 127.0.0.1 4447 &> /dev/null; do echo waiting for wildfly; sleep 5; done;
 until nc -z -v -w5 127.0.0.1 8080 &> /dev/null; do echo waiting for wildfly; sleep 5; done;
 until nc -z -v -w5 127.0.0.1 8443 &> /dev/null; do echo waiting for wildfly; sleep 5; done;
-until nc -z -v -w5 127.0.0.1 8009 &> /dev/null; do echo waiting for wildfly; sleep 5; done;	
+until nc -z -v -w5 127.0.0.1 8009 &> /dev/null; do echo waiting for wildfly; sleep 5; done;
+
+check=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/ejbca/)
+ok=0
+while [ $ok != 200 ]
+do
+echo "ESPERANDO A QUE INICIE EL WILDFLY..."
+ok=$check
+sleep 5
+done
+
+
 if [ ! -z $CA_SERVER_DOMAIN ]; then
 echo "-----> UTILIZANDO COMO NOMBRE DE DOMINIO PARA CA SERVER $CA_SERVER_DOMAIN"
 sed -i -e "s/^httpsserver.hostname=localhost/httpsserver.hostname=$CA_SERVER_DOMAIN/" /opt/ejbca/conf/web.properties
