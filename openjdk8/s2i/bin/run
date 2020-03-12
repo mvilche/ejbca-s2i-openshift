@@ -28,7 +28,7 @@ fi
 	echo "···································································································"
 
 
-if [ ! "$WILDFLY_DIR/standalone/configuration/keystore" ]; then
+if [ ! -f "/opt/ejbca/p12/initReady" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/stdout &
 sleep 60
@@ -39,7 +39,7 @@ echo "-----> RECUERDE IMPORTAR EL CERTIFICADO superadmin.p12 EN SU NAVEGADOR"
 echo "-----> GENERADO EN EL VOLUMEN PERSISTENTE"
 echo "-----> PASSWORD: ejbca"
 echo "-----> ###############################################"
-else "-----> CERTIFICADOS ENCONTRADOS, CONTINUANDO CON EL INICIO DE EJBCA"
+touch /opt/ejbca/p12/initReady
 fi
 
 
