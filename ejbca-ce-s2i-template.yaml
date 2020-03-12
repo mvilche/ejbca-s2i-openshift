@@ -50,6 +50,9 @@
         spec:
           containers:
             - image: "${APP_NAME}:latest"
+              env:
+                - name: CA_SERVER_DOMAIN
+                  value: ${CA_SERVER_DOMAIN}
               imagePullPolicy: Always
               name: ${APP_NAME}
               ports:
@@ -906,6 +909,10 @@
     - name: BRANCH_GIT
       displayName: Nombre del branch del repositorio
       value: "master"
+      required: true
+    - name: CA_SERVER_DOMAIN
+      displayName: Nombre de dominio del sitio CA Server para la generación de los certificados
+      value: "*.miapp.com.uy"
       required: true
     - name: POSTGRES_USER
       displayName: Postgres usuario
