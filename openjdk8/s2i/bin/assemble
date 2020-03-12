@@ -31,7 +31,7 @@ rm -rf /tmp/src
 
 if [ -f /opt/ejbca/build.xml ]; then
 echo "COMPILANDO ANT.."
-cd /opt/ejbca && ant build
+cd /opt/ejbca && ant clean build
 
 ERR=$?
     if [ $ERR -ne 0 ]; then
