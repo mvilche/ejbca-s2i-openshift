@@ -63,7 +63,10 @@
                   name: https
                 - containerPort: 8009
                   protocolo: TCP
-                  name: ajp                                
+                  name: ajp
+                - containerPort: 8442
+                  protocolo: TCP
+                  name: priv                                                        
               livenessProbe:
                 failureThreshold: 3
                 initialDelaySeconds: 60
@@ -147,7 +150,7 @@
           incremental: true
           from:
             kind: ImageStreamTag
-            name: wildfly-10-s2i:latest
+            name: wildfly-14-s2i:latest
         type: Source
       successfulBuildsHistoryLimit: 5
       triggers:
@@ -155,7 +158,7 @@
         - imageChange:
             from:
               kind: "ImageStreamTag"
-              name: "wildfly-10-s2i:latest"        
+              name: "wildfly-14-s2i:latest"        
 
 
 
@@ -185,7 +188,11 @@
         - name: https
           port: 8443
           protocol: TCP
-          targetPort: 8443          
+          targetPort: 8443
+        - name: priv
+          port: 8443
+          protocol: TCP
+          targetPort: 8442                  
       selector:
         app: ${APP_NAME}
         deploymentconfig: ${APP_NAME}
@@ -252,15 +259,15 @@
     metadata:
       labels:
         app: ${APP_NAME}
-        build: wildfly-10-s2i
-      name: wildfly-10-s2i
+        build: wildfly-14-s2i
+      name: wildfly-14-s2i
     spec:
       failedBuildsHistoryLimit: 5
       nodeSelector: null
       output:
         to:
           kind: ImageStreamTag
-          name: 'wildfly-10-s2i:latest'
+          name: 'wildfly-14-s2i:latest'
       postCommit: {}
       resources: {}
       runPolicy: Serial
@@ -284,7 +291,7 @@
     metadata:
       labels:
         app: ${APP_NAME}
-      name: wildfly-10-s2i
+      name: wildfly-14-s2i
     spec: {}
 
 
@@ -305,6 +312,7 @@
           JAVA_OPTS="-javaagent:/usr/libexec/s2i/jolokia-jvm-1.6.2-agent.jar=host=0.0.0.0,protocol=https,keystore=$JBOSS_HOME/jolokia.jks,keystorePassword=password -Dfile.encoding=UTF8 -XX:+ExitOnOutOfMemoryError -Djava.net.preferIPv4Stack=true"
           JAVA_OPTS="$JAVA_OPTS -Djboss.modules.system.pkgs=$JBOSS_MODULES_SYSTEM_PKGS -Djava.awt.headless=true"
           fi
+
         else
           echo "JAVA_OPTS already set in environment; overriding default settings with values: $JAVA_OPTS"
         fi
@@ -462,7 +470,7 @@
                 <subsystem xmlns="urn:jboss:domain:datasources:5.0">
                     <datasources>
                         <datasource jndi-name="java:/EjbcaDS" pool-name="ejbcads" use-ccm="true">
-                            <connection-url>jdbc:postgresql://172.17.0.3/ejbca</connection-url>
+                            <connection-url>jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}</connection-url>
                             <driver-class>org.postgresql.Driver</driver-class>
                             <driver>postgresql.jar</driver>
                             <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
@@ -472,8 +480,8 @@
                                 <prefill>true</prefill>
                             </pool>
                             <security>
-                                <user-name>postgres</user-name>
-                                <password>ejbca</password>
+                                <user-name>${POSTGRES_USER}</user-name>
+                                <password>${POSTGRES_PASSWORD}</password>
                             </security>
                             <validation>
                                 <check-valid-connection-sql>select 1;</check-valid-connection-sql>
