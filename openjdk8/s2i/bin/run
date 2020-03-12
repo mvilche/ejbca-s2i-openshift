@@ -28,21 +28,30 @@ fi
 	echo "···································································································"
 
 
-if [ ! -f "/opt/ejbca/p12/initReady" ]; then
+if [ ! -f "$WILDFLY_DIR/standalone/configuration/keystore/nodelete" ]; then
 echo "-----> NO SE ENCONTRARON LOS CERTIFICADOS NECESARIOS - INICIALIZANDO...."
 exec $WILDFLY_DIR/bin/standalone.sh -c custom/standalone.xml -b 0.0.0.0 &> /dev/stdout &
 sleep 60
 cd /opt/ejbca && ant runinstall &> /dev/null && ant deploy-keystore &> /dev/null && echo "-----> CERTIFICADOS INICIADOS CORRECTAMENTE."
-kill -9 $(pidof java)
+
+javapid=$(pidof java)
+kill -15 $javapid
+
+while [ $javapid == 0 ]
+do
+echo "-----> AGUARDANDO QUE WILDFLY SE CIERRE DE FORMA CORRECTA"
+sleep 5
+javapid=$(pidof java)
+done
+
 echo "-----> ###############################################"
 echo "-----> RECUERDE IMPORTAR EL CERTIFICADO superadmin.p12 EN SU NAVEGADOR"
 echo "-----> GENERADO EN EL VOLUMEN PERSISTENTE"
 echo "-----> PASSWORD: ejbca"
 echo "-----> ###############################################"
-touch /opt/ejbca/p12/initReady
+touch $WILDFLY_DIR/standalone/configuration/keystore/nodelete
+
 fi
-
-
 
 cat $WILDFLY_DIR/standalone/configuration/custom/standalone.conf > $WILDFLY_DIR/bin/standalone.conf
 keytool -genkey -keyalg RSA -alias selfsigned -keystore $WILDFLY_DIR/jolokia.jks -storepass password -validity 360 -keysize 2048 -dname "cn=jolokia, ou=jolokia, o=jolokia, c=jolokia"
