@@ -1,6 +1,6 @@
 FROM alpine:3.11
 
-ENV WILDFLY_VERSION=https://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.tar.gz \
+ENV WILDFLY_VERSION=https://download.jboss.org/wildfly/14.0.1.Final/wildfly-14.0.1.Final.tar.gz \
 JDK_VERSION=openjdk8
 
 LABEL autor="Martin Vilche <mfvilche@gmail.com>" \
@@ -18,7 +18,7 @@ RUN apk add --update --no-cache $JDK_VERSION wget apache-ant findutils bash git 
 RUN mkdir -p /opt/wildfly && rm -rf /etc/localtime  && \
 wget $WILDFLY_VERSION --progress=bar:force -O /tmp/wildfly.tar.gz && \
 tar zxvf /tmp/wildfly.tar.gz -C /opt/wildfly --strip-components 1 && rm -rf /tmp/wildfly.tar.gz
-COPY contrib/wfmodules/ /opt/wildfly/modules/
+COPY contrib/wfmodules/postgresql.jar /opt/wildfly/standalone/deployments
 COPY contrib/wfmodules/biz /opt/wildfly/modules/system/layers/base/biz
 COPY contrib/wfcfg/standalone.xml /opt/wildfly/standalone/configuration/custom/standalone.xml
 COPY contrib/wfcfg/standalone.conf /opt/wildfly/bin/standalone.conf
