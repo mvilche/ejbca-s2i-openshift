@@ -97,6 +97,9 @@
               volumeMounts:
                 - mountPath: /opt/wildfly/standalone/configuration/custom/
                   name: configmap-1
+                - name: ejbca-data
+                  mountPath: /opt/ejbca/p12
+                  subPath: ejbca-data-p12                  
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -111,6 +114,9 @@
                     path: standalone.conf
                 name: wildfly-config-${APP_NAME}
               name: configmap-1
+            - name: ejbca-data
+              persistentVolumeClaim:
+                claimName: ejbca-data                 
       test: false
       triggers:
         - type: ConfigChange
@@ -122,6 +128,20 @@
               kind: ImageStreamTag
               name: "${APP_NAME}:latest"
           type: ImageChange
+
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      finalizers:
+      - kubernetes.io/pvc-protection
+      name: ejbca-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi          
 
   - apiVersion: v1
     kind: BuildConfig
